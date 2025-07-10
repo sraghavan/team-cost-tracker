@@ -3,6 +3,7 @@ import ExcelTable from './components/ExcelTable';
 import WeekendForm from './components/WeekendForm';
 import ExcelWhatsApp from './components/ExcelWhatsApp';
 import CacheManager from './components/CacheManager';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
 import { useDatabase } from './hooks/useDatabase';
 import './App.css';
 
@@ -128,6 +129,8 @@ function App() {
         onImportPlayers={handleImportPlayers}
         getCacheInfo={getCacheInfo}
       />
+      
+      <PWAInstallPrompt />
       
       <header className="App-header">
         <h1>🏏 Team Cost Tracker</h1>

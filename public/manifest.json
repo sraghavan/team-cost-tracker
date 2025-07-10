@@ -1,0 +1,59 @@
+{
+  "short_name": "Cost Splitter",
+  "name": "Team Cost Splitter - Cricket Team Expenses",
+  "description": "Manage and split cricket team expenses with ease. Track payments, generate reports, and share summaries via WhatsApp.",
+  "icons": [
+    {
+      "src": "icon-192x192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icon-512x512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#25d366",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["finance", "productivity", "sports"],
+  "lang": "en",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Add Expenses",
+      "short_name": "Add",
+      "description": "Quickly add weekend expenses",
+      "url": "/?action=add",
+      "icons": [{ "src": "icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Generate Report",
+      "short_name": "Report",
+      "description": "Generate WhatsApp summary",
+      "url": "/?action=report",
+      "icons": [{ "src": "icon-192x192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-narrow.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "screenshot-wide.png", 
+      "sizes": "1024x593",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+}
