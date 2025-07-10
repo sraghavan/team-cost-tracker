@@ -4,6 +4,7 @@ import WeekendForm from './components/WeekendForm';
 import ExcelWhatsApp from './components/ExcelWhatsApp';
 import CacheManager from './components/CacheManager';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
+import SettingsTab from './components/SettingsTab';
 import { useDatabase } from './hooks/useDatabase';
 import './App.css';
 
@@ -21,6 +22,16 @@ function App() {
   } = useDatabase([]);
 
   const [activeTab, setActiveTab] = useState('tracker');
+
+  const handleReminderSettingsChange = (settings) => {
+    // Send message to service worker to schedule reminders
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'SCHEDULE_REMINDER',
+        settings
+      });
+    }
+  };
 
   const addPlayer = (player) => {
     setPlayers([...players, player]);
@@ -101,6 +112,13 @@ function App() {
             <ExcelWhatsApp players={players} />
           </div>
         );
+      case 'settings':
+        return (
+          <SettingsTab 
+            players={players} 
+            onReminderSettingsChange={handleReminderSettingsChange}
+          />
+        );
       default:
         return (
           <div>
@@ -134,6 +152,22 @@ function App() {
       
       <header className="App-header">
         <h1>🏏 Team Cost Tracker</h1>
+        
+        <nav className="tab-navigation">
+          <button 
+            className={`tab-btn ${activeTab === 'tracker' ? 'active' : ''}`}
+            onClick={() => setActiveTab('tracker')}
+          >
+            📊 Tracker
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('settings')}
+          >
+            ⚙️ Settings
+          </button>
+        </nav>
+        
         <div className="data-controls">
           <button onClick={handleExport} className="export-btn">📤 Export JSON</button>
           <label className="import-btn">

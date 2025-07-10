@@ -11,6 +11,8 @@
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .App-header h1 {
@@ -40,6 +42,38 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
+.tab-navigation {
+  display: flex;
+  gap: 10px;
+  order: 2;
+}
+
+.tab-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tab-btn.active {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+}
+
+.data-controls {
+  order: 3;
+}
+
 
 .App-main {
   padding: 20px;
@@ -56,9 +90,22 @@
   
   .App-header h1 {
     font-size: 1.5rem;
+    order: 1;
+  }
+  
+  .tab-navigation {
+    order: 2;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .tab-btn {
+    flex: 1;
+    text-align: center;
   }
   
   .data-controls {
+    order: 3;
     flex-direction: column;
     width: 100%;
   }
@@ -68,7 +115,6 @@
     width: 100%;
     text-align: center;
   }
-  
   
   .App-main {
     padding: 15px;

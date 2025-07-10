@@ -92,5 +92,223 @@ function doBackgroundSync() {
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
+  } else if (event.data && event.data.type === 'SCHEDULE_REMINDER') {
+    scheduleReminder(event.data.settings);
   }
 });
+
+// Push notification event handler
+self.addEventListener('push', event => {
+  if (event.data) {
+    const data = event.data.json();
+    const options = {
+      body: data.body,
+      icon: '/icon-192x192.svg',
+      badge: '/icon-192x192.svg',
+      tag: 'payment-reminder',
+      data: data.data,
+      actions: [
+        {
+          action: 'view',
+          title: 'View Details'
+        },
+        {
+          action: 'share',
+          title: 'Share to WhatsApp'
+        }
+      ]
+    };
+    
+    event.waitUntil(
+      self.registration.showNotification(data.title, options)
+    );
+  }
+});
+
+// Notification click event handler
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  
+  if (event.action === 'view') {
+    // Open the app
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  } else if (event.action === 'share') {
+    // Open WhatsApp with reminder message
+    const data = event.notification.data;
+    if (data && data.whatsappMessage) {
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(data.whatsappMessage)}`;
+      event.waitUntil(
+        clients.openWindow(whatsappUrl)
+      );
+    }
+  } else {
+    // Default action - open app
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  }
+});
+
+// Schedule reminder notifications
+function scheduleReminder(settings) {
+  if (!settings.enabled) return;
+  
+  // Clear existing alarms
+  clearReminders();
+  
+  // Calculate next reminder time
+  const now = new Date();
+  const [hours, minutes] = settings.time.split(':').map(Number);
+  const nextReminder = new Date(now);
+  nextReminder.setHours(hours, minutes, 0, 0);
+  
+  // If time has passed today, schedule for tomorrow
+  if (nextReminder <= now) {
+    nextReminder.setDate(nextReminder.getDate() + 1);
+  }
+  
+  // Calculate interval based on frequency
+  let intervalDays = 1;
+  switch (settings.frequency) {
+    case 'daily':
+      intervalDays = 1;
+      break;
+    case 'weekly':
+      intervalDays = 7;
+      break;
+    case 'custom':
+      intervalDays = settings.customDays || 7;
+      break;
+  }
+  
+  // Store reminder settings
+  const reminderData = {
+    nextReminder: nextReminder.getTime(),
+    intervalDays,
+    settings
+  };
+  
+  // Use IndexedDB to store reminder schedule
+  storeReminderSchedule(reminderData);
+  
+  // Set up periodic check
+  setInterval(() => {
+    checkAndSendReminders();
+  }, 60000); // Check every minute
+}
+
+// Store reminder schedule in IndexedDB
+function storeReminderSchedule(data) {
+  const request = indexedDB.open('CostSplitterDB', 1);
+  
+  request.onsuccess = (event) => {
+    const db = event.target.result;
+    const transaction = db.transaction(['settings'], 'readwrite');
+    const store = transaction.objectStore('settings');
+    
+    store.put({
+      key: 'reminderSchedule',
+      value: data,
+      timestamp: Date.now()
+    });
+  };
+}
+
+// Check and send reminders
+function checkAndSendReminders() {
+  const request = indexedDB.open('CostSplitterDB', 1);
+  
+  request.onsuccess = (event) => {
+    const db = event.target.result;
+    const transaction = db.transaction(['settings', 'players'], 'readonly');
+    const settingsStore = transaction.objectStore('settings');
+    const playersStore = transaction.objectStore('players');
+    
+    settingsStore.get('reminderSchedule').onsuccess = (event) => {
+      const scheduleData = event.target.result;
+      if (!scheduleData) return;
+      
+      const { nextReminder, intervalDays, settings } = scheduleData.value;
+      const now = Date.now();
+      
+      if (now >= nextReminder) {
+        // Get players data
+        playersStore.getAll().onsuccess = (event) => {
+          const players = event.target.result;
+          sendReminderNotification(players, settings);
+          
+          // Schedule next reminder
+          const newNextReminder = nextReminder + (intervalDays * 24 * 60 * 60 * 1000);
+          storeReminderSchedule({
+            nextReminder: newNextReminder,
+            intervalDays,
+            settings
+          });
+        };
+      }
+    };
+  };
+}
+
+// Send reminder notification
+function sendReminderNotification(players, settings) {
+  const pendingPlayers = players.filter(player => {
+    const isPending = player.status === 'Pending';
+    const isPartial = player.status === 'Partially Paid';
+    const hasPlayed = (player.saturday || 0) > 0 || (player.sunday || 0) > 0;
+    
+    return hasPlayed && (
+      (settings.includePending && isPending) ||
+      (settings.includePartial && isPartial)
+    );
+  });
+  
+  if (pendingPlayers.length === 0) return;
+  
+  const whatsappMessage = `⏰ *Payment Reminder*\n${new Date().toLocaleDateString()}\n\n` +
+    pendingPlayers.map(player => 
+      `${player.name}: ₹${player.total || 0} (${player.status || 'Pending'})`
+    ).join('\n') +
+    '\n\n_Team Cost Tracker_';
+  
+  const notificationData = {
+    title: 'Payment Reminder',
+    body: `${pendingPlayers.length} players have pending payments`,
+    data: {
+      whatsappMessage,
+      pendingCount: pendingPlayers.length
+    }
+  };
+  
+  self.registration.showNotification(notificationData.title, {
+    body: notificationData.body,
+    icon: '/icon-192x192.svg',
+    badge: '/icon-192x192.svg',
+    tag: 'payment-reminder',
+    data: notificationData.data,
+    actions: [
+      {
+        action: 'view',
+        title: 'View Details'
+      },
+      {
+        action: 'share',
+        title: 'Share to WhatsApp'
+      }
+    ]
+  });
+}
+
+// Clear existing reminders
+function clearReminders() {
+  // Clear from IndexedDB
+  const request = indexedDB.open('CostSplitterDB', 1);
+  request.onsuccess = (event) => {
+    const db = event.target.result;
+    const transaction = db.transaction(['settings'], 'readwrite');
+    const store = transaction.objectStore('settings');
+    store.delete('reminderSchedule');
+  };
+}
