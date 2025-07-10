@@ -1,17 +1,25 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import './ExcelWhatsApp.css';
 
 const ExcelWhatsApp = ({ players }) => {
   const canvasRef = useRef(null);
+  const [showPendingOnly, setShowPendingOnly] = useState(false); // Default to 'all', checkbox for 'pending only'
 
   const generateWhatsAppImage = () => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     
     // Filter players who played (have non-zero Saturday or Sunday amount)
-    const playersWhoPlayed = players.filter(player => 
+    let playersWhoPlayed = players.filter(player => 
       (player.saturday || 0) > 0 || (player.sunday || 0) > 0
     );
+    
+    // Apply additional filter based on user selection
+    if (showPendingOnly) {
+      playersWhoPlayed = playersWhoPlayed.filter(player => 
+        player.status === 'Pending' || player.status === 'Partially Paid' || player.total < 0
+      );
+    }
     
     // Get match dates from the first player who played (they all have the same dates)
     const matchDates = playersWhoPlayed.length > 0 ? playersWhoPlayed[0].matchDates : null;
@@ -48,10 +56,20 @@ const ExcelWhatsApp = ({ players }) => {
       ctx.fillText(`Updated: ${new Date().toLocaleDateString()}`, canvas.width / 2, 110);
     }
     
-    // Table header
+    // Table header with borders
     let yPos = 150;
+    const tableX = 20;
+    const tableWidth = canvas.width - 40;
+    const headerHeight = 35;
+    
+    // Header background
     ctx.fillStyle = '#f8f9fa';
-    ctx.fillRect(20, yPos - 30, canvas.width - 40, 35);
+    ctx.fillRect(tableX, yPos - 30, tableWidth, headerHeight);
+    
+    // Header border
+    ctx.strokeStyle = '#333333';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(tableX, yPos - 30, tableWidth, headerHeight);
     
     ctx.fillStyle = '#333333';
     ctx.font = 'bold 14px Arial';
@@ -70,25 +88,57 @@ const ExcelWhatsApp = ({ players }) => {
       { text: 'Prev', x: 140 },
       { text: match1Date, x: 200 },
       { text: match2Date, x: 250 },
-      { text: 'Adv', x: 300 },
+      { text: 'Paid', x: 300 },
       { text: 'Total', x: 350 },
       { text: 'Status', x: 420 }
     ];
     
-    columns.forEach(col => {
+    // Draw column separators and headers
+    const colWidths = [110, 60, 50, 50, 50, 70, 100]; // Approximate column widths
+    let colX = tableX;
+    
+    columns.forEach((col, index) => {
       ctx.fillText(col.text, col.x, yPos - 10);
+      
+      // Draw vertical column separator
+      if (index < columns.length - 1) {
+        colX += colWidths[index];
+        ctx.beginPath();
+        ctx.moveTo(colX, yPos - 30);
+        ctx.lineTo(colX, yPos + 5);
+        ctx.stroke();
+      }
     });
     
-    // Player rows
+    // Player rows with borders
     ctx.font = '13px Arial';
+    const rowHeight = 35;
+    
     playersWhoPlayed.forEach((player, index) => {
-      yPos += 35;
+      yPos += rowHeight;
       
       // Alternate row background
       if (index % 2 === 0) {
         ctx.fillStyle = '#f8f9fa';
-        ctx.fillRect(20, yPos - 25, canvas.width - 40, 30);
+        ctx.fillRect(tableX, yPos - 25, tableWidth, 30);
       }
+      
+      // Row border
+      ctx.strokeStyle = '#cccccc';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(tableX, yPos - 25, tableWidth, 30);
+      
+      // Draw vertical column separators for each row
+      colX = tableX;
+      colWidths.forEach((width, colIndex) => {
+        if (colIndex < colWidths.length - 1) {
+          colX += width;
+          ctx.beginPath();
+          ctx.moveTo(colX, yPos - 25);
+          ctx.lineTo(colX, yPos + 5);
+          ctx.stroke();
+        }
+      });
       
       ctx.fillStyle = '#333333';
       ctx.textAlign = 'left';
@@ -147,7 +197,8 @@ const ExcelWhatsApp = ({ players }) => {
     
     // Download
     const link = document.createElement('a');
-    link.download = `team-cost-update-${new Date().toISOString().split('T')[0]}.png`;
+    const suffix = showPendingOnly ? 'pending' : 'all';
+    link.download = `team-cost-update-${suffix}-${new Date().toISOString().split('T')[0]}.png`;
     link.href = canvas.toDataURL();
     link.click();
   };
@@ -176,23 +227,42 @@ const ExcelWhatsApp = ({ players }) => {
 
   return (
     <div className="excel-whatsapp">
-      <div className="generator-header">
-        <h3>📱 WhatsApp Summary Generator</h3>
-        <div className="quick-summary">
-          <span>Total: ₹{getTotalAmount()}</span>
-          <span>Pending: {getPendingCount()}</span>
-          <span>Partial: {getPartiallyPaidCount()}</span>
-          <span>Paid: {getPaidCount()}</span>
+      <div className="whatsapp-controls">
+        <div className="info-box">
+          <div className="box-header">
+            <span className="icon">📱</span>
+            <span className="title">WhatsApp Summary</span>
+          </div>
+          <div className="stats">
+            <span>Total: ₹{getTotalAmount()}</span>
+            <span>•</span>
+            <span>Pending: {getPendingCount()}</span>
+            <span>•</span>
+            <span>Paid: {getPaidCount()}</span>
+          </div>
+        </div>
+        
+        <div className="options-box">
+          <label className="checkbox-option">
+            <input 
+              type="checkbox" 
+              checked={showPendingOnly}
+              onChange={(e) => setShowPendingOnly(e.target.checked)}
+            />
+            <span>Pending Only</span>
+          </label>
+        </div>
+        
+        <div className="action-box">
+          <button 
+            className="generate-btn"
+            onClick={generateWhatsAppImage}
+            disabled={getPlayersWhoPlayed().length === 0}
+          >
+            📸 Generate Image
+          </button>
         </div>
       </div>
-      
-      <button 
-        className="generate-btn"
-        onClick={generateWhatsAppImage}
-        disabled={getPlayersWhoPlayed().length === 0}
-      >
-        📸 Generate WhatsApp Image
-      </button>
       
       <canvas 
         ref={canvasRef} 

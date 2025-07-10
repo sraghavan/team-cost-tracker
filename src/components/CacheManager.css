@@ -1,8 +1,16 @@
 .cache-manager {
   position: fixed;
-  top: 20px;
-  right: 20px;
   z-index: 1000;
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
+
+.cache-manager.dragging {
+  opacity: 0.8;
+}
+
+.cache-manager:hover {
+  opacity: 1;
 }
 
 .save-status {
@@ -14,6 +22,11 @@
   border-radius: 20px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   border: 1px solid #e9ecef;
+  cursor: grab;
+}
+
+.save-status:active {
+  cursor: grabbing;
 }
 
 .status-indicator {
@@ -43,6 +56,8 @@
   padding: 2px;
   border-radius: 4px;
   transition: background-color 0.2s;
+  position: relative;
+  z-index: 1001;
 }
 
 .manager-toggle:hover {
@@ -52,7 +67,7 @@
 .manager-panel {
   position: absolute;
   top: 50px;
-  right: 0;
+  left: 0;
   width: 320px;
   background: white;
   border-radius: 8px;

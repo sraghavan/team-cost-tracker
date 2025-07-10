@@ -1,7 +1,7 @@
 // Excel export/import utilities
 export const exportToExcel = (players) => {
   // Create CSV content that Excel can open
-  const headers = ['Player', 'Prev Balance', 'Saturday', 'Sunday', 'Adv. Paid', 'Total', 'Status'];
+  const headers = ['Player', 'Prev Balance', 'Saturday', 'Sunday', 'Amount Paid', 'Total', 'Status'];
   const csvContent = [
     headers.join(','),
     ...players.map(player => [
@@ -113,7 +113,7 @@ export const exportToExcelAdvanced = (players) => {
     `Total Outstanding: ₹${totalOutstanding}`,
     `Pending: ${pendingCount} | Partially Paid: ${partiallyPaidCount} | Paid: ${paidCount} players`,
     '',
-    'Player,Prev Balance,Saturday,Sunday,Adv. Paid,Total,Status',
+    'Player,Prev Balance,Saturday,Sunday,Amount Paid,Total,Status',
     ...players.map(player => [
       `"${player.name}"`,
       player.prevBalance || 0,
@@ -146,11 +146,11 @@ export const downloadExcelTemplate = () => {
     'Instructions:',
     '1. Fill in player names in the first column',
     '2. Enter costs for Saturday and Sunday matches',
-    '3. Add advance payments if any',
+    '3. Add amount paid if any',
     '4. Mark status as "Paid" when settled',
     '5. Save and import back to the app',
     '',
-    'Player,Prev Balance,Saturday,Sunday,Adv. Paid,Total,Status',
+    'Player,Prev Balance,Saturday,Sunday,Amount Paid,Total,Status',
     'Harjinder,0,0,0,0,0,Pending',
     'Vijay Lal,0,0,0,0,0,Pending',
     'Kamal Karwal,0,0,0,0,0,Pending',

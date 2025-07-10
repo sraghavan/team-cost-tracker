@@ -214,7 +214,7 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
               <th>Prev Balance</th>
               <th>Saturday</th>
               <th>Sunday</th>
-              <th>Adv. Paid</th>
+              <th>Amount Paid</th>
               <th>Total</th>
               <th>Status</th>
             </tr>

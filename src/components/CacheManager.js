@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { exportToExcelAdvanced, importFromExcel, downloadExcelTemplate } from '../utils/excelUtils';
 import './CacheManager.css';
 
@@ -13,6 +13,10 @@ const CacheManager = ({
 }) => {
   const [showManager, setShowManager] = useState(false);
   const [importFile, setImportFile] = useState(null);
+  const [position, setPosition] = useState({ x: 20, y: 20 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const cacheManagerRef = useRef(null);
 
   const handleExcelExport = () => {
     exportToExcelAdvanced(players);
@@ -60,38 +64,92 @@ const CacheManager = ({
   };
 
   const formatLastSaved = () => {
-    if (!lastSaved) return 'Never';
+    if (!lastSaved || lastSaved === 'never') return 'Ready to save';
+    if (typeof lastSaved === 'string') return lastSaved;
+    
     const now = new Date();
-    const diff = now - lastSaved;
+    const savedDate = new Date(lastSaved);
+    const diff = now - savedDate;
     
     if (diff < 60000) return 'Just now';
     if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
     if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-    return lastSaved.toLocaleDateString();
+    return savedDate.toLocaleDateString();
   };
 
   const getStatusColor = () => {
+    if (!saveStatus || saveStatus === 'idle') return '#17a2b8';
     switch (saveStatus) {
       case 'saved': return '#28a745';
       case 'saving': return '#ffc107';
       case 'error': return '#dc3545';
-      default: return '#6c757d';
+      default: return '#17a2b8';
     }
   };
 
   const getStatusText = () => {
+    if (!saveStatus || saveStatus === 'idle') return 'Ready';
     switch (saveStatus) {
       case 'saved': return 'Saved';
       case 'saving': return 'Saving...';
       case 'error': return 'Error';
-      default: return 'Unknown';
+      default: return 'Ready';
     }
   };
 
   const cacheInfo = getCacheInfo();
 
+  const handleMouseDown = (e) => {
+    if (e.target.closest('.manager-toggle')) return; // Don't drag when clicking the toggle button
+    setIsDragging(true);
+    const rect = cacheManagerRef.current.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    const newX = e.clientX - dragOffset.x;
+    const newY = e.clientY - dragOffset.y;
+    
+    // Keep within viewport bounds
+    const maxX = window.innerWidth - 200;
+    const maxY = window.innerHeight - 50;
+    
+    setPosition({
+      x: Math.max(0, Math.min(newX, maxX)),
+      y: Math.max(0, Math.min(newY, maxY))
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, dragOffset]);
+
   return (
-    <div className="cache-manager">
+    <div 
+      ref={cacheManagerRef}
+      className={`cache-manager ${isDragging ? 'dragging' : ''}`}
+      style={{
+        left: position.x,
+        top: position.y,
+        cursor: isDragging ? 'grabbing' : 'grab'
+      }}
+      onMouseDown={handleMouseDown}
+    >
       <div className="save-status">
         <div 
           className="status-indicator"
