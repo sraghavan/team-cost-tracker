@@ -3,7 +3,7 @@ import ExcelTable from './components/ExcelTable';
 import WeekendForm from './components/WeekendForm';
 import ExcelWhatsApp from './components/ExcelWhatsApp';
 import CacheManager from './components/CacheManager';
-import { useAutoSave } from './hooks/useAutoSave';
+import { useDatabase } from './hooks/useDatabase';
 import './App.css';
 
 function App() {
@@ -14,8 +14,10 @@ function App() {
     lastSaved,
     clearCache,
     restoreFromBackup,
-    getCacheInfo
-  } = useAutoSave([]);
+    getCacheInfo,
+    isOnline,
+    syncPending
+  } = useDatabase([]);
 
   const [activeTab, setActiveTab] = useState('tracker');
 

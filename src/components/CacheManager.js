@@ -141,6 +141,9 @@ const CacheManager = ({
               <div>Last Backup: {cacheInfo.backupTimestamp ? 
                 new Date(cacheInfo.backupTimestamp).toLocaleString() : 'None'}</div>
               <div>Players: {players.length}</div>
+              <div>Database: {cacheInfo.usingDatabase ? '🟢 Connected' : '🔴 Offline Mode'}</div>
+              {cacheInfo.syncPending && <div>🔄 Sync Pending</div>}
+              <div>Network: {cacheInfo.isOnline ? '🟢 Online' : '🔴 Offline'}</div>
             </div>
             <div className="button-group">
               <button onClick={handleRestoreBackup} className="restore-btn">
