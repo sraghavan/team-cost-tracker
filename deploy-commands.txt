@@ -1,0 +1,9 @@
+# Run these commands in your terminal after creating the GitHub repository:
+
+# 1. Connect to your GitHub repository (replace YOUR_USERNAME with your actual GitHub username)
+git remote add origin https://github.com/YOUR_USERNAME/team-cost-tracker.git
+
+# 2. Push your code to GitHub
+git push -u origin main
+
+# After this, your code will be on GitHub and ready for Vercel deployment!
