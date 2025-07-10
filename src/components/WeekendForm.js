@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import './WeekendForm.css';
+import PlayerMaintenanceModal from './PlayerMaintenanceModal';
 
-const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer }) => {
+const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer, onRemovePlayer }) => {
   const [weekendCosts, setWeekendCosts] = useState({
     saturdayGround: '',
     saturdayCafeteria: '',
@@ -48,6 +49,7 @@ const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer }) => {
   });
 
   const [selectedHistoryId, setSelectedHistoryId] = useState('');
+  const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
 
   const handleCostChange = (field, value) => {
     setWeekendCosts(prev => ({
@@ -479,13 +481,23 @@ const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer }) => {
           <div className="player-selection">
             <div className="selection-header">
               <label>Players ({selectedPlayers.saturday.length} selected):</label>
-              <button 
-                type="button" 
-                onClick={() => setShowAddPlayer(true)}
-                className="add-player-btn"
-              >
-                + Add Player
-              </button>
+              <div className="selection-buttons">
+                <button 
+                  type="button" 
+                  onClick={() => setShowAddPlayer(true)}
+                  className="add-player-btn"
+                >
+                  + Add Player
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setShowMaintenanceModal(true)}
+                  className="maintenance-btn-small"
+                  title="Player maintenance"
+                >
+                  👥 Maintenance
+                </button>
+              </div>
             </div>
             
             <div className="player-buckets">
@@ -770,6 +782,14 @@ const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer }) => {
           </div>
         </div>
       )}
+      
+      <PlayerMaintenanceModal 
+        isOpen={showMaintenanceModal}
+        onClose={() => setShowMaintenanceModal(false)}
+        players={players}
+        onDeletePlayer={onRemovePlayer}
+        onAddPlayer={onAddPlayer}
+      />
     </div>
   );
 };

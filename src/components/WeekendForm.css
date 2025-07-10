@@ -319,6 +319,30 @@
   margin-bottom: 10px;
 }
 
+.selection-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.maintenance-btn-small {
+  background: #17a2b8;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.maintenance-btn-small:hover {
+  background: #138496;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
 .selection-header label {
   font-weight: 600;
   color: #495057;

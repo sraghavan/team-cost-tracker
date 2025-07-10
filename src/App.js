@@ -89,7 +89,7 @@ function App() {
       case 'tracker':
         return (
           <div>
-            <WeekendForm players={players} onUpdatePlayers={updateAllPlayers} onAddPlayer={addPlayer} />
+            <WeekendForm players={players} onUpdatePlayers={updateAllPlayers} onAddPlayer={addPlayer} onRemovePlayer={removePlayer} />
             <ExcelTable 
               players={players} 
               onAddPlayer={addPlayer} 

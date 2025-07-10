@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import './ExcelTable.css';
+import PlayerMaintenanceModal from './PlayerMaintenanceModal';
 
 const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUpdatePlayers }) => {
   const [editingCell, setEditingCell] = useState(null);
   const [newPlayerName, setNewPlayerName] = useState('');
+  const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
 
   const handleCellClick = (playerId, field) => {
     setEditingCell({ playerId, field });
@@ -196,23 +198,12 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
   return (
     <div className="excel-table">
       <div className="table-header">
-        <h2>Team Cost Tracker</h2>
-        <div className="weekend-date">
-          Weekend: {new Date().toLocaleDateString()}
+        <div className="header-left">
+          <h2>Team Cost Tracker</h2>
+          <div className="weekend-date">
+            Weekend: {new Date().toLocaleDateString()}
+          </div>
         </div>
-      </div>
-
-      <div className="add-player-form">
-        <form onSubmit={handleAddPlayer}>
-          <input
-            type="text"
-            value={newPlayerName}
-            onChange={(e) => setNewPlayerName(e.target.value)}
-            placeholder="Add new player..."
-            className="add-player-input"
-          />
-          <button type="submit" className="add-player-btn">Add Player</button>
-        </form>
       </div>
 
       <div className="table-container">
@@ -226,7 +217,6 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
               <th>Adv. Paid</th>
               <th>Total</th>
               <th>Status</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -251,15 +241,6 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
                 <td className="editable-cell">
                   <EditableCell player={player} field="status" value={player.status} isNumber={false} />
                 </td>
-                <td className="actions-cell">
-                  <button 
-                    onClick={() => onRemovePlayer(player.id)}
-                    className="remove-btn"
-                    title="Remove player"
-                  >
-                    ×
-                  </button>
-                </td>
               </tr>
             ))}
           </tbody>
@@ -271,6 +252,14 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
           <p>No players added yet. Add your first player above!</p>
         </div>
       )}
+      
+      <PlayerMaintenanceModal 
+        isOpen={showMaintenanceModal}
+        onClose={() => setShowMaintenanceModal(false)}
+        players={players}
+        onDeletePlayer={onRemovePlayer}
+        onAddPlayer={onAddPlayer}
+      />
     </div>
   );
 };
