@@ -1,0 +1,75 @@
+.excel-whatsapp {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-top: 20px;
+  text-align: center;
+}
+
+.generator-header {
+  margin-bottom: 20px;
+}
+
+.generator-header h3 {
+  color: #25d366;
+  margin-bottom: 10px;
+  font-size: 1.3rem;
+}
+
+.quick-summary {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.quick-summary span {
+  background: #f8f9fa;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 14px;
+  color: #495057;
+  border: 1px solid #dee2e6;
+}
+
+.generate-btn {
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  color: white;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+}
+
+.generate-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+}
+
+.generate-btn:active {
+  transform: translateY(0);
+}
+
+.generate-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .quick-summary {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .generate-btn {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+}

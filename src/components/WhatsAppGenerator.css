@@ -1,0 +1,49 @@
+.whatsapp-generator {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.generator-header h3 {
+  color: #25d366;
+  margin-bottom: 10px;
+  font-size: 1.3rem;
+}
+
+.generator-header p {
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
+.generate-btn {
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  color: white;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+}
+
+.generate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+}
+
+.generate-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .generate-btn {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+}

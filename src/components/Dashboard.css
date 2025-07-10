@@ -1,0 +1,197 @@
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.dashboard-header h2 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.week-info {
+  color: #666;
+  font-size: 14px;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.summary-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.summary-card h3 {
+  color: #666;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.amount {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.amount.current-week {
+  color: #007bff;
+}
+
+.amount.pending {
+  color: #dc3545;
+}
+
+.amount.advance {
+  color: #28a745;
+}
+
+.subtitle {
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.players-section {
+  margin-bottom: 30px;
+}
+
+.players-section h3 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.player-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-left: 4px solid #ddd;
+}
+
+.player-card.owes {
+  border-left-color: #dc3545;
+}
+
+.player-card.advance {
+  border-left-color: #28a745;
+}
+
+.player-card.settled {
+  border-left-color: #17a2b8;
+}
+
+.player-name {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.player-balance .owes {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.player-balance .advance {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.player-balance .settled {
+  color: #17a2b8;
+  font-weight: 600;
+}
+
+.current-week-matches h3 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.matches-list {
+  display: grid;
+  gap: 15px;
+}
+
+.match-item {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.match-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.match-date {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.match-teams {
+  font-weight: 600;
+  color: #333;
+}
+
+.match-expenses {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.match-expenses .total {
+  font-weight: 600;
+  color: #007bff;
+}
+
+.match-participants {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 10px;
+  }
+  
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .players-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .match-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .match-expenses {
+    flex-direction: column;
+    gap: 5px;
+  }
+}

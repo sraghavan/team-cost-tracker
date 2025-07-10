@@ -1,0 +1,218 @@
+.cache-manager {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.save-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #e9ecef;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.status-text {
+  font-size: 12px;
+  color: #495057;
+  white-space: nowrap;
+}
+
+.manager-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.manager-toggle:hover {
+  background: #f8f9fa;
+}
+
+.manager-panel {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 320px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  border: 1px solid #e9ecef;
+  padding: 20px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.manager-panel h4 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.manager-section {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.manager-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.manager-section h5 {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.export-excel-btn,
+.import-excel-btn,
+.template-btn,
+.restore-btn,
+.clear-btn,
+.clear-all-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.export-excel-btn {
+  background: #28a745;
+  color: white;
+}
+
+.export-excel-btn:hover {
+  background: #218838;
+}
+
+.import-excel-btn {
+  background: #007bff;
+  color: white;
+  display: inline-block;
+}
+
+.import-excel-btn:hover {
+  background: #0056b3;
+}
+
+.template-btn {
+  background: #6f42c1;
+  color: white;
+}
+
+.template-btn:hover {
+  background: #5a32a3;
+}
+
+.restore-btn {
+  background: #ffc107;
+  color: #212529;
+}
+
+.restore-btn:hover {
+  background: #e0a800;
+}
+
+.clear-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.clear-btn:hover {
+  background: #c82333;
+}
+
+.clear-all-btn {
+  background: #e83e8c;
+  color: white;
+  font-weight: 600;
+}
+
+.clear-all-btn:hover {
+  background: #d91a72;
+}
+
+.cache-info {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: #495057;
+}
+
+.cache-info div {
+  margin-bottom: 4px;
+}
+
+.cache-info div:last-child {
+  margin-bottom: 0;
+}
+
+.tips-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.tips-list li {
+  margin-bottom: 4px;
+}
+
+.tips-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .cache-manager {
+    position: relative;
+    top: 0;
+    right: 0;
+    margin-bottom: 20px;
+  }
+
+  .manager-panel {
+    position: static;
+    width: 100%;
+    max-height: none;
+  }
+
+  .save-status {
+    justify-content: center;
+  }
+}

@@ -1,0 +1,249 @@
+.excel-table {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 5px;
+}
+
+.table-header h2 {
+  color: #333;
+  margin: 0;
+}
+
+.weekend-date {
+  color: #666;
+  font-size: 14px;
+}
+
+.add-player-form {
+  margin-bottom: 20px;
+}
+
+.add-player-form form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.add-player-input {
+  flex: 1;
+  max-width: 300px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.add-player-input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.add-player-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.add-player-btn:hover {
+  background: #218838;
+}
+
+.table-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.cost-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cost-table th {
+  background: #f8f9fa;
+  padding: 12px 8px;
+  text-align: center;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.cost-table th:first-child {
+  text-align: left;
+}
+
+.sub-header {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #6c757d;
+  background: #e9ecef;
+  padding: 6px 4px;
+}
+
+.cost-table td {
+  padding: 8px;
+  border-bottom: 1px solid #dee2e6;
+  vertical-align: middle;
+}
+
+.cost-table tr:hover {
+  background: #f8f9fa;
+}
+
+.player-name {
+  font-weight: 600;
+  color: #333;
+  min-width: 120px;
+}
+
+.editable-cell {
+  min-width: 90px;
+  position: relative;
+}
+
+.cell-content {
+  padding: 4px 8px;
+  min-height: 20px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+}
+
+.cell-content:hover {
+  background: #e9ecef;
+}
+
+.cell-input,
+.cell-select {
+  width: 100%;
+  padding: 4px 8px;
+  border: 2px solid #007bff;
+  border-radius: 3px;
+  font-size: 14px;
+  background: white;
+  outline: none;
+}
+
+.total-cell {
+  font-weight: 600;
+  color: #007bff;
+  background: #f8f9fa;
+  min-width: 90px;
+}
+
+.actions-cell {
+  width: 60px;
+  text-align: center;
+}
+
+.remove-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 auto;
+}
+
+.remove-btn:hover {
+  background: #c82333;
+}
+
+.empty-table {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-style: italic;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Status styling */
+.status-pending {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.status-partially-paid {
+  color: #fd7e14;
+  font-weight: 600;
+}
+
+.status-paid {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.cell-content:empty::before {
+  content: 'Click to set';
+  color: #999;
+  font-style: italic;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .excel-table {
+    padding: 10px;
+  }
+  
+  .table-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  
+  .add-player-form form {
+    flex-direction: column;
+  }
+  
+  .add-player-input {
+    max-width: 100%;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  .cost-table {
+    min-width: 700px;
+  }
+  
+  .cost-table th,
+  .cost-table td {
+    padding: 6px 4px;
+    font-size: 12px;
+  }
+  
+  .player-name {
+    min-width: 100px;
+  }
+  
+  .editable-cell {
+    min-width: 70px;
+  }
+}
