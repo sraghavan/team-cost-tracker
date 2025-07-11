@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ExcelTable from './components/ExcelTable';
 import WeekendForm from './components/WeekendForm';
 import ExcelWhatsApp from './components/ExcelWhatsApp';
@@ -6,6 +6,8 @@ import CacheManager from './components/CacheManager';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import SettingsTab from './components/SettingsTab';
 import UpdateNotification from './components/UpdateNotification';
+import PasswordProtection from './components/PasswordProtection';
+import PasswordAdmin from './components/PasswordAdmin';
 import { useDatabase } from './hooks/useDatabase';
 import './App.css';
 
@@ -23,6 +25,43 @@ function App() {
   } = useDatabase([]);
 
   const [activeTab, setActiveTab] = useState('tracker');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentRoute, setCurrentRoute] = useState('');
+
+  // Simple routing based on URL hash
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1); // Remove #
+      setCurrentRoute(hash);
+    };
+
+    // Set initial route
+    handleHashChange();
+    
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+    
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = () => {
+      const isAuth = sessionStorage.getItem('appAuthenticated') === 'true';
+      setIsAuthenticated(isAuth);
+    };
+
+    checkAuth();
+    
+    // Listen for storage changes (in case auth is updated in another tab)
+    window.addEventListener('storage', checkAuth);
+    
+    return () => window.removeEventListener('storage', checkAuth);
+  }, []);
+
+  const handleAuthenticated = () => {
+    setIsAuthenticated(true);
+  };
 
   const handleReminderSettingsChange = (settings) => {
     // Send message to service worker to schedule reminders
@@ -136,6 +175,16 @@ function App() {
         );
     }
   };
+
+  // Handle admin route
+  if (currentRoute === 'admin') {
+    return <PasswordAdmin />;
+  }
+
+  // Handle authentication for main app
+  if (!isAuthenticated) {
+    return <PasswordProtection onAuthenticated={handleAuthenticated} />;
+  }
 
   return (
     <div className="App">
