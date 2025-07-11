@@ -199,7 +199,7 @@ const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer, onRemovePlayer }) 
           sunday: 0,
           advPaid: 0, // Reset amount paid for new week
           total: newTotal,
-          status: player.status === 'Paid' ? 'Pending' : player.status
+          status: player.status === 'Paid' ? '' : player.status // Reset status to empty if previously paid
         };
       });
       onUpdatePlayers(updatedPlayers);
