@@ -1,3 +1,9 @@
+## v1.0.10 - 2025-07-11
+
+- Bug fixes and performance improvements
+- Enhanced user experience
+- Updated dependencies
+
 ## v1.0.9 - 2025-07-11
 
 - Bug fixes and performance improvements
