@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './WeekendForm.css';
 import PlayerMaintenanceModal from './PlayerMaintenanceModal';
+import MatchManager from './MatchManager';
+import { saveMatchToHistory } from '../utils/matchHistory';
 
 const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer, onRemovePlayer }) => {
   const [weekendCosts, setWeekendCosts] = useState({
@@ -50,6 +52,7 @@ const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer, onRemovePlayer }) 
 
   const [selectedHistoryId, setSelectedHistoryId] = useState('');
   const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
+  const [showMatchManager, setShowMatchManager] = useState(false);
 
   const handleCostChange = (field, value) => {
     setWeekendCosts(prev => ({
@@ -136,7 +139,18 @@ const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer, onRemovePlayer }) 
 
     onUpdatePlayers(updatedPlayers);
     
-    // Save to match history
+    // Save to new match history system
+    const matchData = {
+      matchDates,
+      selectedTeams,
+      weekendCosts,
+      selectedPlayers,
+      saturdayTotal: getSaturdayTotal(),
+      sundayTotal: getSundayTotal()
+    };
+    saveMatchToHistory(matchData, updatedPlayers, 'weekend');
+    
+    // Also save to old match history system for backward compatibility
     saveMatchHistory(updatedPlayers, matchDates, selectedTeams, weekendCosts);
     
     setWeekendCosts({ 
@@ -356,6 +370,28 @@ const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer, onRemovePlayer }) 
       // Clear the selection after restoring
       setSelectedHistoryId('');
     }
+  };
+
+  // Handle match restoration from new MatchManager
+  const handleRestoreMatch = (restoredPlayersData, matchInfo) => {
+    onUpdatePlayers(restoredPlayersData);
+    
+    // Update form state if match data is available
+    if (matchInfo.matchData) {
+      const matchData = matchInfo.matchData;
+      if (matchData.matchDates) setMatchDates(matchData.matchDates);
+      if (matchData.selectedTeams) setSelectedTeams(matchData.selectedTeams);
+      if (matchData.weekendCosts) setWeekendCosts(matchData.weekendCosts);
+      if (matchData.selectedPlayers) setSelectedPlayers(matchData.selectedPlayers);
+    }
+    
+    setShowMatchManager(false);
+  };
+
+  // Handle match deletion from MatchManager
+  const handleDeleteMatch = (matchId) => {
+    // This just removes from history, doesn't affect current players
+    console.log(`Match ${matchId} deleted from history`);
   };
 
   return (
@@ -722,6 +758,13 @@ const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer, onRemovePlayer }) 
           >
             Apply to Selected Players
           </button>
+          <button 
+            onClick={() => setShowMatchManager(true)}
+            className="history-btn"
+            title="View match history and undo submissions"
+          >
+            📊 History & Undo
+          </button>
         </div>
       </div>
 
@@ -789,6 +832,14 @@ const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer, onRemovePlayer }) 
         players={players}
         onDeletePlayer={onRemovePlayer}
         onAddPlayer={onAddPlayer}
+      />
+      
+      <MatchManager
+        isOpen={showMatchManager}
+        onClose={() => setShowMatchManager(false)}
+        players={players}
+        onRestoreMatch={handleRestoreMatch}
+        onDeleteMatch={handleDeleteMatch}
       />
     </div>
   );
