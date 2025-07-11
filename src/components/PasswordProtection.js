@@ -41,11 +41,6 @@ const PasswordProtection = ({ onAuthenticated }) => {
     }, 500);
   };
 
-  const handleForgotPassword = () => {
-    // Use history API for SPA navigation
-    window.history.pushState({}, '', '/admin');
-    window.dispatchEvent(new PopStateEvent('popstate'));
-  };
 
   return (
     <div className="password-protection">
@@ -92,13 +87,6 @@ const PasswordProtection = ({ onAuthenticated }) => {
             )}
           </button>
 
-          <button 
-            type="button" 
-            className="forgot-link"
-            onClick={handleForgotPassword}
-          >
-            Admin Panel
-          </button>
         </form>
 
         <div className="auth-footer">

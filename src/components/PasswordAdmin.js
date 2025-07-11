@@ -8,6 +8,7 @@ const PasswordAdmin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [copySuccess, setCopySuccess] = useState(false);
 
   useEffect(() => {
     // Load current password
@@ -22,6 +23,24 @@ const PasswordAdmin = () => {
       setMessage('');
       setMessageType('');
     }, 5000);
+  };
+
+  const handleCopyPassword = async () => {
+    try {
+      await navigator.clipboard.writeText(currentPassword);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = currentPassword;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    }
   };
 
   const handlePasswordChange = (e) => {
@@ -97,7 +116,16 @@ const PasswordAdmin = () => {
             <h3>Current Password</h3>
             <div className="password-display">
               <div className="password-box">
-                <span className="password-value">{currentPassword}</span>
+                <div className="password-row">
+                  <span className="password-value">{currentPassword}</span>
+                  <button 
+                    className="copy-button"
+                    onClick={handleCopyPassword}
+                    title="Copy password"
+                  >
+                    {copySuccess ? '✅' : '📋'}
+                  </button>
+                </div>
                 <span className="password-label">Active Password</span>
               </div>
             </div>
