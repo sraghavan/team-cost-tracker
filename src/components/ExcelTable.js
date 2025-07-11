@@ -218,6 +218,10 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
     return 'Pending';
   };
 
+  const handleMarkAsPaid = (playerId) => {
+    handleCellChange(playerId, 'status', 'Paid');
+  };
+
   const EditableCell = ({ player, field, value, isNumber = true }) => {
     const isEditing = editingCell?.playerId === player.id && editingCell?.field === field;
     
@@ -255,9 +259,32 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
       );
     }
     
+    // Special handling for status field
+    if (field === 'status') {
+      return (
+        <div className="status-cell">
+          <div 
+            className={`cell-content ${value ? `status-${value?.toLowerCase().replace(' ', '-')}` : ''}`}
+            onClick={() => handleCellClick(player.id, field)}
+          >
+            {value || 'Click to set'}
+          </div>
+          {value !== 'Paid' && (
+            <button
+              className="paid-icon-btn"
+              onClick={() => handleMarkAsPaid(player.id)}
+              title="Mark as Paid"
+            >
+              ✅
+            </button>
+          )}
+        </div>
+      );
+    }
+    
     return (
       <div 
-        className={`cell-content ${field === 'status' ? `status-${value?.toLowerCase().replace(' ', '-')}` : ''}`}
+        className={`cell-content`}
         onClick={() => handleCellClick(player.id, field)}
       >
         {isNumber ? formatCurrency(value) : (value || 'Click to set')}

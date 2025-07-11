@@ -279,6 +279,45 @@
   font-style: italic;
 }
 
+/* Status cell with paid icon */
+.status-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.status-cell .cell-content {
+  flex: 1;
+  margin: 0;
+}
+
+.paid-icon-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+}
+
+.paid-icon-btn:hover {
+  background: #218838;
+  transform: scale(1.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.paid-icon-btn:active {
+  transform: scale(0.95);
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .excel-table {
@@ -335,5 +374,16 @@
   
   .editable-cell {
     min-width: 70px;
+  }
+  
+  .paid-icon-btn {
+    min-width: 20px;
+    height: 20px;
+    padding: 2px 4px;
+    font-size: 10px;
+  }
+  
+  .status-cell {
+    gap: 4px;
   }
 }
