@@ -5,6 +5,7 @@ import ExcelWhatsApp from './components/ExcelWhatsApp';
 import CacheManager from './components/CacheManager';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import SettingsTab from './components/SettingsTab';
+import UpdateNotification from './components/UpdateNotification';
 import { useDatabase } from './hooks/useDatabase';
 import './App.css';
 
@@ -149,6 +150,7 @@ function App() {
       />
       
       <PWAInstallPrompt />
+      <UpdateNotification />
       
       <header className="App-header">
         <h1>🏏 Team Cost Tracker</h1>

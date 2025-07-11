@@ -336,6 +336,37 @@ const SettingsTab = ({ players, onReminderSettingsChange }) => {
           </button>
         </div>
       </div>
+
+      <div className="settings-section">
+        <h3>ℹ️ App Information</h3>
+        <div className="app-info">
+          <div className="info-item">
+            <span className="info-label">App Version</span>
+            <span className="info-value">2.1.0</span>
+          </div>
+          <div className="info-item">
+            <span className="info-label">Update Notifications</span>
+            <span className="info-value">
+              {notificationPermission === 'granted' ? '✅ Enabled' : '❌ Disabled'}
+            </span>
+          </div>
+          <div className="info-item">
+            <span className="info-label">PWA Status</span>
+            <span className="info-value">
+              {window.matchMedia('(display-mode: standalone)').matches ? '📱 Installed' : '🌐 Browser'}
+            </span>
+          </div>
+          <div className="info-item">
+            <span className="info-label">Last Update Check</span>
+            <span className="info-value">{new Date().toLocaleString()}</span>
+          </div>
+        </div>
+        
+        <div className="update-info">
+          <p>🚀 <strong>Auto-Update:</strong> You'll receive push notifications when new versions are deployed!</p>
+          <p>📱 <strong>PWA Mode:</strong> Install this app for the best experience and automatic updates.</p>
+        </div>
+      </div>
     </div>
   );
 };

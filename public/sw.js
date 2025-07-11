@@ -1,4 +1,5 @@
-const CACHE_NAME = 'cost-splitter-v1';
+const CACHE_NAME = 'cost-splitter-v2'; // Increment this for each deployment
+const APP_VERSION = '2.1.0'; // Semantic versioning
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
@@ -8,17 +9,25 @@ const urlsToCache = [
   '/icon-512x512.png'
 ];
 
-// Install event - cache resources
+// Install event - cache resources and detect updates
 self.addEventListener('install', event => {
+  console.log(`Installing Service Worker version ${APP_VERSION}`);
+  
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-      .catch(err => {
-        console.log('Cache failed:', err);
-      })
+    Promise.all([
+      // Cache resources
+      caches.open(CACHE_NAME)
+        .then(cache => {
+          console.log('Opened cache');
+          return cache.addAll(urlsToCache);
+        })
+        .catch(err => {
+          console.log('Cache failed:', err);
+        }),
+      
+      // Check for version update
+      checkForAppUpdate()
+    ])
   );
 });
 
@@ -311,4 +320,197 @@ function clearReminders() {
     const store = transaction.objectStore('settings');
     store.delete('reminderSchedule');
   };
+}
+
+// Check for app updates and notify
+async function checkForAppUpdate() {
+  try {
+    // Get stored version
+    const storedVersion = await getStoredVersion();
+    
+    if (storedVersion && storedVersion !== APP_VERSION) {
+      console.log(`App updated from ${storedVersion} to ${APP_VERSION}`);
+      
+      // Send update notification
+      await sendUpdateNotification(storedVersion, APP_VERSION);
+      
+      // Notify main thread about update
+      broadcastUpdateMessage(storedVersion, APP_VERSION);
+    }
+    
+    // Store current version
+    await storeCurrentVersion();
+    
+  } catch (error) {
+    console.error('Error checking for app update:', error);
+  }
+}
+
+// Get stored app version
+function getStoredVersion() {
+  return new Promise((resolve) => {
+    const request = indexedDB.open('CostSplitterDB', 1);
+    
+    request.onsuccess = (event) => {
+      const db = event.target.result;
+      const transaction = db.transaction(['settings'], 'readonly');
+      const store = transaction.objectStore('settings');
+      
+      const getRequest = store.get('appVersion');
+      getRequest.onsuccess = () => {
+        const result = getRequest.result;
+        resolve(result ? result.value : null);
+      };
+      getRequest.onerror = () => resolve(null);
+    };
+    
+    request.onerror = () => resolve(null);
+  });
+}
+
+// Store current app version
+function storeCurrentVersion() {
+  return new Promise((resolve) => {
+    const request = indexedDB.open('CostSplitterDB', 1);
+    
+    request.onsuccess = (event) => {
+      const db = event.target.result;
+      const transaction = db.transaction(['settings'], 'readwrite');
+      const store = transaction.objectStore('settings');
+      
+      store.put({
+        key: 'appVersion',
+        value: APP_VERSION,
+        timestamp: Date.now()
+      });
+      
+      resolve();
+    };
+    
+    request.onerror = () => resolve();
+  });
+}
+
+// Send push notification for app update
+async function sendUpdateNotification(oldVersion, newVersion) {
+  try {
+    const notificationOptions = {
+      title: '🚀 Team Cost Tracker Updated!',
+      body: `New version ${newVersion} is available with improvements and bug fixes.`,
+      icon: '/icon-192x192.svg',
+      badge: '/icon-192x192.svg',
+      tag: 'app-update',
+      requireInteraction: true,
+      actions: [
+        {
+          action: 'update',
+          title: '🔄 Reload App'
+        },
+        {
+          action: 'dismiss',
+          title: '⏰ Later'
+        }
+      ],
+      data: {
+        type: 'app-update',
+        oldVersion,
+        newVersion,
+        updateTime: new Date().toISOString()
+      }
+    };
+    
+    await self.registration.showNotification(
+      notificationOptions.title,
+      notificationOptions
+    );
+    
+  } catch (error) {
+    console.error('Failed to send update notification:', error);
+  }
+}
+
+// Broadcast update message to all clients
+function broadcastUpdateMessage(oldVersion, newVersion) {
+  self.clients.matchAll().then(clients => {
+    clients.forEach(client => {
+      client.postMessage({
+        type: 'APP_UPDATE_AVAILABLE',
+        oldVersion,
+        newVersion,
+        timestamp: Date.now()
+      });
+    });
+  });
+}
+
+// Handle update notification clicks
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  
+  if (event.notification.tag === 'app-update') {
+    if (event.action === 'update') {
+      // Reload all clients
+      event.waitUntil(
+        self.clients.matchAll().then(clients => {
+          clients.forEach(client => {
+            client.postMessage({
+              type: 'RELOAD_APP'
+            });
+          });
+        })
+      );
+    } else if (event.action === 'dismiss') {
+      // Schedule reminder for later
+      setTimeout(() => {
+        sendUpdateReminder();
+      }, 2 * 60 * 60 * 1000); // Remind after 2 hours
+    } else {
+      // Default action - open app
+      event.waitUntil(
+        clients.openWindow('/')
+      );
+    }
+    return;
+  }
+  
+  // Handle other notification clicks (existing code)
+  if (event.action === 'view') {
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  } else if (event.action === 'share') {
+    const data = event.notification.data;
+    if (data && data.whatsappMessage) {
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(data.whatsappMessage)}`;
+      event.waitUntil(
+        clients.openWindow(whatsappUrl)
+      );
+    }
+  } else {
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  }
+});
+
+// Send update reminder
+async function sendUpdateReminder() {
+  try {
+    await self.registration.showNotification(
+      '⏰ App Update Reminder',
+      {
+        body: 'Don\'t forget to update your Team Cost Tracker for the latest features!',
+        icon: '/icon-192x192.svg',
+        tag: 'app-update-reminder',
+        actions: [
+          {
+            action: 'update',
+            title: '🔄 Update Now'
+          }
+        ]
+      }
+    );
+  } catch (error) {
+    console.error('Failed to send update reminder:', error);
+  }
 }
