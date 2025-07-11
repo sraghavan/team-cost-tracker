@@ -10,6 +10,8 @@
   align-items: center;
   margin-bottom: 20px;
   padding: 0 5px;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .header-left {
@@ -31,6 +33,50 @@
 .weekend-date {
   color: #666;
   font-size: 14px;
+}
+
+.table-controls {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-group,
+.sort-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-group label,
+.sort-group label {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.control-select {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.control-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.control-select:hover {
+  border-color: #999;
 }
 
 .add-player-form {
@@ -243,6 +289,22 @@
     flex-direction: column;
     gap: 10px;
     text-align: center;
+  }
+  
+  .table-controls {
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .filter-group,
+  .sort-group {
+    flex-direction: column;
+    gap: 4px;
+    text-align: center;
+  }
+  
+  .control-select {
+    min-width: 140px;
   }
   
   .add-player-form form {

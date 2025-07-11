@@ -6,6 +6,8 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
   const [editingCell, setEditingCell] = useState(null);
   const [newPlayerName, setNewPlayerName] = useState('');
   const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('default');
 
   const handleCellClick = (playerId, field) => {
     setEditingCell({ playerId, field });
@@ -130,15 +132,62 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
     return value ? `₹${value}` : '';
   };
 
-  const getSortedPlayers = (players) => {
-    return [...players].sort((a, b) => {
-      const aPlayed = (a.saturday || 0) > 0 || (a.sunday || 0) > 0;
-      const bPlayed = (b.saturday || 0) > 0 || (b.sunday || 0) > 0;
-      
-      if (aPlayed && !bPlayed) return -1;
-      if (!aPlayed && bPlayed) return 1;
-      
-      return a.name.localeCompare(b.name);
+  const getFilteredAndSortedPlayers = (players) => {
+    // First filter by status
+    let filteredPlayers = [...players];
+    
+    if (statusFilter !== 'all') {
+      filteredPlayers = filteredPlayers.filter(player => {
+        const status = (player.status || '').toLowerCase();
+        
+        switch (statusFilter) {
+          case 'pending':
+            return status === 'pending';
+          case 'partially-paid':
+            return status === 'partially paid';
+          case 'paid':
+            return status === 'paid';
+          case 'no-status':
+            return status === '' || !status;
+          default:
+            return true;
+        }
+      });
+    }
+    
+    // Then sort
+    return filteredPlayers.sort((a, b) => {
+      switch (sortBy) {
+        case 'status':
+          const statusOrder = { 'pending': 1, 'partially paid': 2, 'paid': 3, '': 4 };
+          const aStatus = (a.status || '').toLowerCase();
+          const bStatus = (b.status || '').toLowerCase();
+          const aOrder = statusOrder[aStatus] || 5;
+          const bOrder = statusOrder[bStatus] || 5;
+          
+          if (aOrder !== bOrder) return aOrder - bOrder;
+          return a.name.localeCompare(b.name);
+          
+        case 'name':
+          return a.name.localeCompare(b.name);
+          
+        case 'total':
+          const aTotalNum = parseFloat(a.total) || 0;
+          const bTotalNum = parseFloat(b.total) || 0;
+          if (aTotalNum !== bTotalNum) return bTotalNum - aTotalNum; // Descending
+          return a.name.localeCompare(b.name);
+          
+        case 'default':
+        default:
+          // Default sorting: players who played first, then by name
+          const aPlayed = (a.saturday || 0) > 0 || (a.sunday || 0) > 0;
+          const bPlayed = (b.saturday || 0) > 0 || (b.sunday || 0) > 0;
+          
+          if (aPlayed && !bPlayed) return -1;
+          if (!aPlayed && bPlayed) return 1;
+          
+          return a.name.localeCompare(b.name);
+      }
     });
   };
 
@@ -204,6 +253,39 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
             Weekend: {new Date().toLocaleDateString()}
           </div>
         </div>
+        
+        <div className="table-controls">
+          <div className="filter-group">
+            <label htmlFor="status-filter">Filter:</label>
+            <select 
+              id="status-filter"
+              value={statusFilter} 
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="control-select"
+            >
+              <option value="all">All Players</option>
+              <option value="pending">Pending Only</option>
+              <option value="partially-paid">Partially Paid</option>
+              <option value="paid">Paid Only</option>
+              <option value="no-status">No Status</option>
+            </select>
+          </div>
+          
+          <div className="sort-group">
+            <label htmlFor="sort-by">Sort by:</label>
+            <select 
+              id="sort-by"
+              value={sortBy} 
+              onChange={(e) => setSortBy(e.target.value)}
+              className="control-select"
+            >
+              <option value="default">Default</option>
+              <option value="status">Status</option>
+              <option value="name">Name</option>
+              <option value="total">Total Amount</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <div className="table-container">
@@ -220,7 +302,7 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
             </tr>
           </thead>
           <tbody>
-            {getSortedPlayers(players).map(player => (
+            {getFilteredAndSortedPlayers(players).map(player => (
               <tr key={player.id}>
                 <td className="player-name">{player.name}</td>
                 <td className="editable-cell">
