@@ -18,12 +18,49 @@ const DatabaseTest = () => {
     setEnvVars(vars);
   };
 
+  const testRawSupabase = async () => {
+    const url = process.env.REACT_APP_SUPABASE_URL;
+    const key = process.env.REACT_APP_SUPABASE_ANON_KEY;
+    
+    try {
+      const response = await fetch(`${url}/rest/v1/`, {
+        method: 'GET',
+        headers: {
+          'apikey': key,
+          'Authorization': `Bearer ${key}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.text();
+      return {
+        test: 'Raw Supabase API Test',
+        status: 'success',
+        message: `Connected successfully. Response: ${data.substring(0, 100)}...`
+      };
+    } catch (error) {
+      return {
+        test: 'Raw Supabase API Test',
+        status: 'error',
+        message: `Connection failed: ${error.message}`
+      };
+    }
+  };
+
   const runTests = async () => {
     setIsLoading(true);
     const results = [];
     
     // Check environment variables first
     checkEnvVars();
+    
+    // Test raw Supabase connection
+    const rawTest = await testRawSupabase();
+    results.push(rawTest);
 
     // Test 1: Get app settings
     try {
