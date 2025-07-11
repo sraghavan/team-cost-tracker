@@ -86,8 +86,29 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
       [field]: field === 'status' ? numValue : Math.round(numValue)
     };
     
-    // Auto-calculate total
-    if (field !== 'total') {
+    // Special handling when status is changed to "Paid"
+    if (field === 'status' && numValue === 'Paid') {
+      // Calculate current amount owed
+      const currentTotal = (updatedPlayer.prevBalance || 0) + 
+                          (updatedPlayer.saturday || 0) + 
+                          (updatedPlayer.sunday || 0) - 
+                          (updatedPlayer.advPaid || 0);
+      
+      // If there's an amount owed, set advPaid to cover it
+      if (currentTotal > 0) {
+        updatedPlayer.advPaid = (updatedPlayer.prevBalance || 0) + 
+                               (updatedPlayer.saturday || 0) + 
+                               (updatedPlayer.sunday || 0);
+      }
+      
+      // Recalculate total (should be 0 or negative now)
+      updatedPlayer.total = (updatedPlayer.prevBalance || 0) + 
+                           (updatedPlayer.saturday || 0) + 
+                           (updatedPlayer.sunday || 0) - 
+                           (updatedPlayer.advPaid || 0);
+    }
+    // Auto-calculate total for other fields
+    else if (field !== 'total') {
       updatedPlayer.total = 
         (updatedPlayer.prevBalance || 0) + 
         (updatedPlayer.saturday || 0) + 
