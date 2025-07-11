@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { matchHistory } from '../utils/matchHistory';
+import { matchHistory, validatePlayerTotals } from '../utils/matchHistory';
 import './MatchManager.css';
 
 const MatchManager = ({ players, onRestoreMatch, onDeleteMatch, isOpen, onClose }) => {
@@ -8,13 +8,15 @@ const MatchManager = ({ players, onRestoreMatch, onDeleteMatch, isOpen, onClose 
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
   const [stats, setStats] = useState(null);
+  const [validation, setValidation] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
       loadHistory();
       loadStats();
+      loadValidation();
     }
-  }, [isOpen]);
+  }, [isOpen, players]);
 
   const loadHistory = () => {
     const recentHistory = matchHistory.getRecentSubmissions(30); // Last 30 days
@@ -24,6 +26,13 @@ const MatchManager = ({ players, onRestoreMatch, onDeleteMatch, isOpen, onClose 
   const loadStats = () => {
     const historyStats = matchHistory.getStats();
     setStats(historyStats);
+  };
+
+  const loadValidation = () => {
+    if (players && players.length > 0) {
+      const validationResults = validatePlayerTotals(players);
+      setValidation(validationResults);
+    }
   };
 
   const handleUndoMatch = (matchId) => {
@@ -43,7 +52,13 @@ const MatchManager = ({ players, onRestoreMatch, onDeleteMatch, isOpen, onClose 
       if (confirmAction === 'undo') {
         const result = matchHistory.undoMatch(selectedMatch, players);
         onRestoreMatch(result.restoredPlayersData, result.matchInfo);
-        alert('Match successfully undone! Player data has been restored.');
+        
+        // Calculate impact
+        const undoneEntry = history.find(h => h.id === selectedMatch);
+        const totalRemoved = undoneEntry?.playersSummary?.totalAmount || 0;
+        const playersAffected = undoneEntry?.playersSummary?.playersWhoPlayed || 0;
+        
+        alert(`Match successfully undone!\n\nImpact:\n- ${playersAffected} players affected\n- ₹${totalRemoved} removed from totals\n- Player balances recalculated`);
       } else if (confirmAction === 'delete') {
         matchHistory.deleteMatch(selectedMatch);
         onDeleteMatch(selectedMatch);
@@ -130,6 +145,48 @@ const MatchManager = ({ players, onRestoreMatch, onDeleteMatch, isOpen, onClose 
                 <span className="stat-label">Imports</span>
                 <span className="stat-value">{stats.imports}</span>
               </div>
+            </div>
+          </div>
+        )}
+
+        {validation && (
+          <div className="validation-section">
+            <h3>✅ Data Validation</h3>
+            <div className="validation-status">
+              {validation.isValid ? (
+                <div className="validation-success">
+                  <span className="status-icon">✅</span>
+                  <span>All player totals are correctly calculated</span>
+                </div>
+              ) : (
+                <div className="validation-error">
+                  <span className="status-icon">❌</span>
+                  <span>{validation.errors.length} calculation errors found</span>
+                  <details className="error-details">
+                    <summary>View Details</summary>
+                    <ul>
+                      {validation.errors.map((error, index) => (
+                        <li key={index}>{error}</li>
+                      ))}
+                    </ul>
+                  </details>
+                </div>
+              )}
+              
+              {validation.warnings.length > 0 && (
+                <div className="validation-warnings">
+                  <span className="status-icon">⚠️</span>
+                  <span>{validation.warnings.length} status warnings</span>
+                  <details className="warning-details">
+                    <summary>View Warnings</summary>
+                    <ul>
+                      {validation.warnings.map((warning, index) => (
+                        <li key={index}>{warning}</li>
+                      ))}
+                    </ul>
+                  </details>
+                </div>
+              )}
             </div>
           </div>
         )}
