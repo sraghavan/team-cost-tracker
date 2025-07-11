@@ -1,6 +1,6 @@
 {
   "name": "cost-splitter",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "private": true,
   "dependencies": {
     "@supabase/supabase-js": "^2.50.4",
