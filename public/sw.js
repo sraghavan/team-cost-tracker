@@ -1,5 +1,5 @@
-const CACHE_NAME = 'cost-splitter-v7'; // Increment this for each deployment
-const APP_VERSION = '1.0.5'; // Semantic versioning
+const CACHE_NAME = 'cost-splitter-v8'; // Increment this for each deployment
+const APP_VERSION = '1.0.6'; // Semantic versioning
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
