@@ -187,14 +187,21 @@ const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer, onRemovePlayer }) 
 
   const handleMoveToNextWeek = () => {
     if (window.confirm('Move current totals to Previous Balance and reset weekend costs?')) {
-      const updatedPlayers = players.map(player => ({
-        ...player,
-        prevBalance: player.total || 0,
-        saturday: 0,
-        sunday: 0,
-        total: player.total || 0,
-        status: player.status === 'Paid' ? 'Pending' : player.status
-      }));
+      const updatedPlayers = players.map(player => {
+        // Calculate new prev balance and total for next week
+        const newPrevBalance = player.total || 0;
+        const newTotal = newPrevBalance; // Start fresh with just the carried balance
+        
+        return {
+          ...player,
+          prevBalance: newPrevBalance,
+          saturday: 0,
+          sunday: 0,
+          advPaid: 0, // Reset amount paid for new week
+          total: newTotal,
+          status: player.status === 'Paid' ? 'Pending' : player.status
+        };
+      });
       onUpdatePlayers(updatedPlayers);
       setSelectedPlayers({
         saturday: [],
