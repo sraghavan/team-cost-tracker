@@ -46,7 +46,8 @@ export const usePasswordManager = () => {
             return settings.password;
           }
         } catch (dbError) {
-          console.warn('Failed to load password from database:', dbError);
+          console.error('Failed to load password from database:', dbError);
+          setError(`Database error: ${dbError.message}`);
           // Fall back to localStorage
         }
       }
@@ -90,7 +91,8 @@ export const usePasswordManager = () => {
           await dbOperations.saveAppSettings({ password: newPassword });
           console.log('Password saved to database');
         } catch (dbError) {
-          console.warn('Failed to save password to database:', dbError);
+          console.error('Failed to save password to database:', dbError);
+          setError(`Database save error: ${dbError.message}`);
           // Still continue since localStorage save succeeded
         }
       }

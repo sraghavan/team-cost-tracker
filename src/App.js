@@ -8,6 +8,7 @@ import SettingsTab from './components/SettingsTab';
 import UpdateNotification from './components/UpdateNotification';
 import PasswordProtection from './components/PasswordProtection';
 import PasswordAdmin from './components/PasswordAdmin';
+import DatabaseTest from './components/DatabaseTest';
 import { useDatabase } from './hooks/useDatabase';
 import './App.css';
 
@@ -179,6 +180,11 @@ function App() {
   // Handle admin route
   if (currentRoute === '/admin') {
     return <PasswordAdmin />;
+  }
+
+  // Handle database test route
+  if (currentRoute === '/dbtest') {
+    return <DatabaseTest />;
   }
 
   // Handle authentication for main app
