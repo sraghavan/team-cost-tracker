@@ -4,10 +4,26 @@ import { dbOperations } from '../lib/supabase';
 const DatabaseTest = () => {
   const [testResults, setTestResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [envVars, setEnvVars] = useState({});
+
+  const checkEnvVars = () => {
+    const vars = {
+      REACT_APP_SUPABASE_URL: process.env.REACT_APP_SUPABASE_URL,
+      REACT_APP_SUPABASE_ANON_KEY: process.env.REACT_APP_SUPABASE_ANON_KEY,
+      url_length: process.env.REACT_APP_SUPABASE_URL?.length || 0,
+      key_length: process.env.REACT_APP_SUPABASE_ANON_KEY?.length || 0,
+      url_has_newlines: process.env.REACT_APP_SUPABASE_URL?.includes('\n') || false,
+      key_has_newlines: process.env.REACT_APP_SUPABASE_ANON_KEY?.includes('\n') || false,
+    };
+    setEnvVars(vars);
+  };
 
   const runTests = async () => {
     setIsLoading(true);
     const results = [];
+    
+    // Check environment variables first
+    checkEnvVars();
 
     // Test 1: Get app settings
     try {
@@ -68,6 +84,10 @@ const DatabaseTest = () => {
         {isLoading ? 'Running Tests...' : 'Run Database Tests'}
       </button>
       
+      <button onClick={checkEnvVars} style={{ marginLeft: '10px' }}>
+        Check Environment Variables
+      </button>
+      
       {testResults.length > 0 && (
         <div style={{ marginTop: '20px' }}>
           <h3>Test Results:</h3>
@@ -87,6 +107,28 @@ const DatabaseTest = () => {
               <small>{result.message}</small>
             </div>
           ))}
+        </div>
+      )}
+      
+      {Object.keys(envVars).length > 0 && (
+        <div style={{ marginTop: '20px' }}>
+          <h3>Environment Variables:</h3>
+          <div style={{ 
+            backgroundColor: '#f8f9fa', 
+            padding: '10px', 
+            borderRadius: '4px',
+            border: '1px solid #ddd'
+          }}>
+            {Object.entries(envVars).map(([key, value]) => (
+              <div key={key} style={{ margin: '5px 0' }}>
+                <strong>{key}:</strong> {
+                  key.includes('KEY') ? 
+                    (value ? `[${value.length} chars] ${value.substring(0, 20)}...` : 'Missing') 
+                    : String(value)
+                }
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

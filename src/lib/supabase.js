@@ -3,12 +3,34 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
 const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Validate environment variables
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase environment variables');
+  console.error('REACT_APP_SUPABASE_URL:', supabaseUrl);
+  console.error('REACT_APP_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'Present' : 'Missing');
+}
+
+// Clean up the variables (remove any whitespace or newlines)
+const cleanUrl = supabaseUrl?.trim();
+const cleanKey = supabaseAnonKey?.trim();
+
+let supabase = null;
+try {
+  supabase = createClient(cleanUrl, cleanKey);
+} catch (error) {
+  console.error('Failed to create Supabase client:', error);
+  console.error('URL:', cleanUrl);
+  console.error('Key length:', cleanKey?.length);
+}
+
+export { supabase };
 
 // Database operations
 export const dbOperations = {
   // Players operations
   async getPlayers() {
+    if (!supabase) throw new Error('Supabase client not initialized');
+    
     const { data, error } = await supabase
       .from('players')
       .select('*')
@@ -126,6 +148,8 @@ export const dbOperations = {
 
   // App settings operations
   async getAppSettings() {
+    if (!supabase) throw new Error('Supabase client not initialized');
+    
     const { data, error } = await supabase
       .from('app_settings')
       .select('*')
@@ -136,6 +160,8 @@ export const dbOperations = {
   },
 
   async saveAppSettings(settings) {
+    if (!supabase) throw new Error('Supabase client not initialized');
+    
     const { data, error } = await supabase
       .from('app_settings')
       .upsert({
