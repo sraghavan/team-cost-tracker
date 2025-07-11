@@ -122,5 +122,32 @@ export const dbOperations = {
       .neq('id', '');
     
     if (historyError) throw historyError;
+  },
+
+  // App settings operations
+  async getAppSettings() {
+    const { data, error } = await supabase
+      .from('app_settings')
+      .select('*')
+      .limit(1);
+    
+    if (error) throw error;
+    return data && data.length > 0 ? data[0] : null;
+  },
+
+  async saveAppSettings(settings) {
+    const { data, error } = await supabase
+      .from('app_settings')
+      .upsert({
+        id: 'main',
+        password: settings.password,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'id'
+      })
+      .select();
+    
+    if (error) throw error;
+    return data[0];
   }
 };

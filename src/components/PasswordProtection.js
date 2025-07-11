@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { usePasswordManager } from '../hooks/usePasswordManager';
 import './PasswordProtection.css';
 
 const PasswordProtection = ({ onAuthenticated }) => {
+  const { getStoredPassword, currentPassword } = usePasswordManager();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -14,10 +16,6 @@ const PasswordProtection = ({ onAuthenticated }) => {
     }
   }, [onAuthenticated]);
 
-  const getStoredPassword = () => {
-    // Get password from localStorage, default to a simple one
-    return localStorage.getItem('appPassword') || 'cricket2024';
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();

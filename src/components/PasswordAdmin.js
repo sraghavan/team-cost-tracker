@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { usePasswordManager } from '../hooks/usePasswordManager';
 import './PasswordAdmin.css';
 
 const PasswordAdmin = () => {
-  const [currentPassword, setCurrentPassword] = useState('');
+  const {
+    currentPassword,
+    isLoading: passwordLoading,
+    error: passwordError,
+    isOnline,
+    savePassword,
+    getStoredPassword
+  } = usePasswordManager();
+
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [copySuccess, setCopySuccess] = useState(false);
-
-  useEffect(() => {
-    // Load current password
-    const stored = localStorage.getItem('appPassword') || 'cricket2024';
-    setCurrentPassword(stored);
-  }, []);
 
   const showMessage = (text, type = 'success') => {
     setMessage(text);
@@ -43,7 +46,7 @@ const PasswordAdmin = () => {
     }
   };
 
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = async (e) => {
     e.preventDefault();
     
     if (!newPassword.trim()) {
@@ -63,13 +66,11 @@ const PasswordAdmin = () => {
 
     setIsLoading(true);
 
-    // Simulate slight delay for better UX
-    setTimeout(() => {
-      try {
-        // Update password in localStorage
-        localStorage.setItem('appPassword', newPassword);
-        setCurrentPassword(newPassword);
-        
+    try {
+      // Save password using the hook (saves to both localStorage and database)
+      const success = await savePassword(newPassword);
+      
+      if (success) {
         // Clear form
         setNewPassword('');
         setConfirmPassword('');
@@ -78,14 +79,19 @@ const PasswordAdmin = () => {
         sessionStorage.removeItem('appAuthenticated');
         sessionStorage.removeItem('authTime');
         
-        showMessage('Password updated successfully! Users will need to re-authenticate.', 'success');
+        const statusMessage = isOnline 
+          ? 'Password updated successfully and synced to database! Users will need to re-authenticate.'
+          : 'Password updated locally! Will sync to database when online. Users will need to re-authenticate.';
         
-      } catch (error) {
+        showMessage(statusMessage, 'success');
+      } else {
         showMessage('Failed to update password. Please try again.', 'error');
       }
-      
+    } catch (error) {
+      showMessage('Failed to update password. Please try again.', 'error');
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   const handleReset = () => {
@@ -108,6 +114,17 @@ const PasswordAdmin = () => {
           <div className="admin-logo">🔐</div>
           <h1>Password Administration</h1>
           <p>Manage the app access password</p>
+          
+          <div className="connection-status">
+            {isOnline ? (
+              <span className="status-online">🟢 Online - Syncing to Database</span>
+            ) : (
+              <span className="status-offline">🔴 Offline - Local Storage Only</span>
+            )}
+            {passwordError && (
+              <span className="status-error">⚠️ Database Error: {passwordError}</span>
+            )}
+          </div>
         </div>
 
         <div className="admin-content">
