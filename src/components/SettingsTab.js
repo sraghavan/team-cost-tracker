@@ -342,7 +342,7 @@ const SettingsTab = ({ players, onReminderSettingsChange }) => {
         <div className="app-info">
           <div className="info-item">
             <span className="info-label">App Version</span>
-            <span className="info-value">1.0.10</span>
+            <span className="info-value">1.0.11</span>
           </div>
           <div className="info-item">
             <span className="info-label">Update Notifications</span>
