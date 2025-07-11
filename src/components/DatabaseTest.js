@@ -7,13 +7,18 @@ const DatabaseTest = () => {
   const [envVars, setEnvVars] = useState({});
 
   const checkEnvVars = () => {
+    const key = process.env.REACT_APP_SUPABASE_ANON_KEY;
     const vars = {
       REACT_APP_SUPABASE_URL: process.env.REACT_APP_SUPABASE_URL,
       REACT_APP_SUPABASE_ANON_KEY: process.env.REACT_APP_SUPABASE_ANON_KEY,
       url_length: process.env.REACT_APP_SUPABASE_URL?.length || 0,
-      key_length: process.env.REACT_APP_SUPABASE_ANON_KEY?.length || 0,
+      key_length: key?.length || 0,
       url_has_newlines: process.env.REACT_APP_SUPABASE_URL?.includes('\n') || false,
-      key_has_newlines: process.env.REACT_APP_SUPABASE_ANON_KEY?.includes('\n') || false,
+      key_has_newlines: key?.includes('\n') || false,
+      key_first_20: key?.substring(0, 20) || 'Missing',
+      key_last_20: key?.substring(key.length - 20) || 'Missing',
+      key_has_dots: key?.split('.').length || 0,
+      key_is_jwt: key?.startsWith('eyJ') || false,
     };
     setEnvVars(vars);
   };
