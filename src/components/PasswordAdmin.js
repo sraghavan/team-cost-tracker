@@ -77,7 +77,9 @@ const PasswordAdmin = () => {
   };
 
   const goBack = () => {
-    window.location.href = '/';
+    // Use history API for SPA navigation
+    window.history.pushState({}, '', '/');
+    window.dispatchEvent(new PopStateEvent('popstate'));
   };
 
   return (

@@ -28,20 +28,20 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentRoute, setCurrentRoute] = useState('');
 
-  // Simple routing based on URL hash
+  // Simple routing based on URL path
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.slice(1); // Remove #
-      setCurrentRoute(hash);
+    const handleRouteChange = () => {
+      const path = window.location.pathname;
+      setCurrentRoute(path);
     };
 
     // Set initial route
-    handleHashChange();
+    handleRouteChange();
     
-    // Listen for hash changes
-    window.addEventListener('hashchange', handleHashChange);
+    // Listen for popstate (back/forward navigation)
+    window.addEventListener('popstate', handleRouteChange);
     
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('popstate', handleRouteChange);
   }, []);
 
   // Check authentication status
@@ -177,7 +177,7 @@ function App() {
   };
 
   // Handle admin route
-  if (currentRoute === 'admin') {
+  if (currentRoute === '/admin') {
     return <PasswordAdmin />;
   }
 

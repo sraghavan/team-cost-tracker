@@ -5,7 +5,6 @@ const PasswordProtection = ({ onAuthenticated }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
     // Check if user is already authenticated
@@ -43,8 +42,9 @@ const PasswordProtection = ({ onAuthenticated }) => {
   };
 
   const handleForgotPassword = () => {
-    setShowHint(true);
-    setTimeout(() => setShowHint(false), 10000); // Hide hint after 10 seconds
+    // Use history API for SPA navigation
+    window.history.pushState({}, '', '/admin');
+    window.dispatchEvent(new PopStateEvent('popstate'));
   };
 
   return (
@@ -77,13 +77,6 @@ const PasswordProtection = ({ onAuthenticated }) => {
             </div>
           )}
 
-          {showHint && (
-            <div className="hint-message">
-              💡 <strong>Hint:</strong> Default password is "cricket2024". 
-              Visit <code>/admin</code> to change it.
-            </div>
-          )}
-
           <button 
             type="submit" 
             className="auth-button"
@@ -104,7 +97,7 @@ const PasswordProtection = ({ onAuthenticated }) => {
             className="forgot-link"
             onClick={handleForgotPassword}
           >
-            Forgot password?
+            Admin Panel
           </button>
         </form>
 
