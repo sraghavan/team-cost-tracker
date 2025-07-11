@@ -318,6 +318,32 @@
   transform: scale(0.95);
 }
 
+.undo-icon-btn {
+  background: #fd7e14;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+}
+
+.undo-icon-btn:hover {
+  background: #e96306;
+  transform: scale(1.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.undo-icon-btn:active {
+  transform: scale(0.95);
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .excel-table {
@@ -376,7 +402,8 @@
     min-width: 70px;
   }
   
-  .paid-icon-btn {
+  .paid-icon-btn,
+  .undo-icon-btn {
     min-width: 20px;
     height: 20px;
     padding: 2px 4px;

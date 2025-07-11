@@ -222,6 +222,21 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
     handleCellChange(playerId, 'status', 'Paid');
   };
 
+  const handleUndoPayment = (playerId) => {
+    const player = players.find(p => p.id === playerId);
+    if (!player) return;
+    
+    // Reset amount paid to 0 and recalculate
+    const updatedPlayer = {
+      ...player,
+      advPaid: 0,
+      total: (player.prevBalance || 0) + (player.saturday || 0) + (player.sunday || 0),
+      status: ''
+    };
+    
+    onUpdatePlayer(updatedPlayer);
+  };
+
   const EditableCell = ({ player, field, value, isNumber = true }) => {
     const isEditing = editingCell?.playerId === player.id && editingCell?.field === field;
     
@@ -261,6 +276,10 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
     
     // Special handling for status field
     if (field === 'status') {
+      const playerTotal = player.total || 0;
+      const isPaid = value === 'Paid';
+      const hasAmountOwed = playerTotal > 0;
+      
       return (
         <div className="status-cell">
           <div 
@@ -269,7 +288,15 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
           >
             {value || 'Click to set'}
           </div>
-          {value !== 'Paid' && (
+          {isPaid ? (
+            <button
+              className="undo-icon-btn"
+              onClick={() => handleUndoPayment(player.id)}
+              title="Undo Payment"
+            >
+              ↩️
+            </button>
+          ) : hasAmountOwed ? (
             <button
               className="paid-icon-btn"
               onClick={() => handleMarkAsPaid(player.id)}
@@ -277,7 +304,7 @@ const ExcelTable = ({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer, onUp
             >
               ✅
             </button>
-          )}
+          ) : null}
         </div>
       );
     }
