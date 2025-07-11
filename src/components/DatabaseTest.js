@@ -32,19 +32,51 @@ const DatabaseTest = () => {
         }
       });
       
+      const responseText = await response.text();
+      
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        return {
+          test: 'Raw Supabase API Test',
+          status: 'error',
+          message: `HTTP ${response.status}: ${response.statusText}. Response: ${responseText}`
+        };
       }
       
-      const data = await response.text();
       return {
         test: 'Raw Supabase API Test',
         status: 'success',
-        message: `Connected successfully. Response: ${data.substring(0, 100)}...`
+        message: `Connected successfully. Response: ${responseText.substring(0, 100)}...`
       };
     } catch (error) {
       return {
         test: 'Raw Supabase API Test',
+        status: 'error',
+        message: `Connection failed: ${error.message}`
+      };
+    }
+  };
+
+  const testSupabaseHealth = async () => {
+    const url = process.env.REACT_APP_SUPABASE_URL;
+    
+    try {
+      const response = await fetch(`${url}/rest/v1/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const responseText = await response.text();
+      
+      return {
+        test: 'Supabase Health Check (no auth)',
+        status: response.ok ? 'success' : 'error',
+        message: `HTTP ${response.status}: ${responseText.substring(0, 200)}...`
+      };
+    } catch (error) {
+      return {
+        test: 'Supabase Health Check',
         status: 'error',
         message: `Connection failed: ${error.message}`
       };
@@ -57,6 +89,10 @@ const DatabaseTest = () => {
     
     // Check environment variables first
     checkEnvVars();
+    
+    // Test Supabase health (no auth)
+    const healthTest = await testSupabaseHealth();
+    results.push(healthTest);
     
     // Test raw Supabase connection
     const rawTest = await testRawSupabase();
