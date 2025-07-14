@@ -192,6 +192,16 @@ const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer, onRemovePlayer }) 
         const newPrevBalance = player.total || 0;
         const newTotal = newPrevBalance; // Start fresh with just the carried balance
         
+        // Set proper status based on the carried forward amount
+        let newStatus = '';
+        if (newTotal > 0) {
+          newStatus = 'Pending'; // They owe money from previous week
+        } else if (player.status === 'Paid') {
+          newStatus = ''; // Reset paid status for fresh start
+        } else {
+          newStatus = ''; // Clear status for zero or negative balances
+        }
+        
         return {
           ...player,
           prevBalance: newPrevBalance,
@@ -199,7 +209,7 @@ const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer, onRemovePlayer }) 
           sunday: 0,
           advPaid: 0, // Reset amount paid for new week
           total: newTotal,
-          status: player.status === 'Paid' ? '' : player.status // Reset status to empty if previously paid
+          status: newStatus
         };
       });
       onUpdatePlayers(updatedPlayers);

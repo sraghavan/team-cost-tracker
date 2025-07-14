@@ -9,17 +9,27 @@ const ExcelWhatsApp = ({ players }) => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     
-    // Filter players who played (have non-zero Saturday or Sunday amount)
+    // Filter players who played OR have outstanding balances
     let playersWhoPlayed = players.filter(player => 
-      (player.saturday || 0) > 0 || (player.sunday || 0) > 0
+      (player.saturday || 0) > 0 || (player.sunday || 0) > 0 || (player.total || 0) > 0
     );
     
     // Apply additional filter based on user selection
     if (showPendingOnly) {
       playersWhoPlayed = playersWhoPlayed.filter(player => 
-        player.status === 'Pending' || player.status === 'Partially Paid' || player.total < 0
+        player.status === 'Pending' || player.status === 'Partially Paid' || (player.total || 0) > 0
       );
     }
+    
+    // Sort players: Pending first, then Partially Paid, then Paid, then by name
+    playersWhoPlayed.sort((a, b) => {
+      const statusOrder = { 'Pending': 1, 'Partially Paid': 2, 'Paid': 3, '': 4 };
+      const aOrder = statusOrder[a.status] || 5;
+      const bOrder = statusOrder[b.status] || 5;
+      
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return a.name.localeCompare(b.name);
+    });
     
     // Get match dates from the first player who played (they all have the same dates)
     const matchDates = playersWhoPlayed.length > 0 ? playersWhoPlayed[0].matchDates : null;
@@ -205,7 +215,7 @@ const ExcelWhatsApp = ({ players }) => {
 
   const getPlayersWhoPlayed = () => {
     return players.filter(player => 
-      (player.saturday || 0) > 0 || (player.sunday || 0) > 0
+      (player.saturday || 0) > 0 || (player.sunday || 0) > 0 || (player.total || 0) > 0
     );
   };
 
