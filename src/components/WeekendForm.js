@@ -255,9 +255,19 @@ const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer, onRemovePlayer }) 
   };
 
   const getOtherPlayersForTeam = (team) => {
-    const regularPlayers = getRegularPlayersForTeam(team);
-    const regularPlayerIds = regularPlayers.map(p => p.id);
-    return players.filter(player => !regularPlayerIds.includes(player.id));
+    const miccPlayers = [
+      'Kamal Karwal', 'Anjeev', 'Sailesh', 'Nikhil', 'Shyam', 'Sagar', 'Parag', 
+      'Sudhir', 'Baram (Gullu)', 'Ashish Sikka', 'Bhanu', 'Shantanu', 'Sunil Anna', 'Avinash'
+    ];
+    
+    const sadhoozPlayers = [
+      'Kamal Karwal', 'Anjeev', 'Sailesh', 'Nikhil', 'Shyam', 'PK', 'Amit Tyagi', 
+      'Sudhir', 'Baram (Gullu)', 'Harjinder', 'Vijay Lal', 'Aryan', 'Sunil Anna', 'Avinash'
+    ];
+    
+    const regularPlayerNames = team === 'MICC' ? miccPlayers : team === 'SADHOOZ' ? sadhoozPlayers : [];
+    
+    return players.filter(player => !regularPlayerNames.includes(player.name));
   };
 
   const handleSelectAllRegular = (day, team) => {

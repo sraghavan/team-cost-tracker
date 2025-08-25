@@ -16,7 +16,17 @@ const PlayerMaintenanceModal = ({ isOpen, onClose, players, onDeletePlayer, onAd
 
   const handleAddPlayer = () => {
     if (newPlayerName.trim()) {
-      onAddPlayer(newPlayerName.trim());
+      const newPlayer = {
+        id: Date.now().toString() + Math.random(),
+        name: newPlayerName.trim(),
+        prevBalance: 0,
+        saturday: 0,
+        sunday: 0,
+        advPaid: 0,
+        total: 0,
+        status: ''
+      };
+      onAddPlayer(newPlayer);
       setNewPlayerName('');
       setShowAddForm(false);
     }
