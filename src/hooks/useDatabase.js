@@ -11,7 +11,20 @@ export const useDatabase = (initialData = []) => {
   const [data, setData] = useState(() => {
     try {
       const cached = localStorage.getItem(CACHE_KEY);
-      return cached ? JSON.parse(cached) : initializePlayersIfEmpty(initialData);
+      let loadedData = cached ? JSON.parse(cached) : initializePlayersIfEmpty(initialData);
+      
+      // Remove duplicate players by name, keeping the first occurrence
+      const seen = new Set();
+      loadedData = loadedData.filter(player => {
+        if (seen.has(player.name)) {
+          console.warn(`Removing duplicate player: ${player.name}`);
+          return false;
+        }
+        seen.add(player.name);
+        return true;
+      });
+      
+      return loadedData;
     } catch (error) {
       console.error('Error loading cached data:', error);
       return initializePlayersIfEmpty(initialData);
@@ -60,7 +73,7 @@ export const useDatabase = (initialData = []) => {
       setSaveStatus('loading');
       const players = await dbOperations.getPlayers();
       if (players.length > 0) {
-        const formattedPlayers = players.map(p => ({
+        let formattedPlayers = players.map(p => ({
           id: p.id,
           name: p.name,
           prevBalance: p.prev_balance || 0,
@@ -71,6 +84,18 @@ export const useDatabase = (initialData = []) => {
           status: p.status || '',
           matchDates: p.match_dates || {}
         }));
+        
+        // Remove duplicate players by name, keeping the first occurrence
+        const seen = new Set();
+        formattedPlayers = formattedPlayers.filter(player => {
+          if (seen.has(player.name)) {
+            console.warn(`Removing duplicate player from database: ${player.name}`);
+            return false;
+          }
+          seen.add(player.name);
+          return true;
+        });
+        
         setData(formattedPlayers);
         localStorage.setItem(CACHE_KEY, JSON.stringify(formattedPlayers));
       }
@@ -145,7 +170,17 @@ export const useDatabase = (initialData = []) => {
   }, [data]);
 
   const updateData = useCallback((newData) => {
-    setData(newData);
+    // Remove duplicate players by name before saving
+    const seen = new Set();
+    const dedupedData = newData.filter(player => {
+      if (seen.has(player.name)) {
+        console.warn(`Preventing duplicate player: ${player.name}`);
+        return false;
+      }
+      seen.add(player.name);
+      return true;
+    });
+    setData(dedupedData);
   }, []);
 
   const clearCache = useCallback(async () => {

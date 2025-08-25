@@ -73,8 +73,16 @@ const WeekendForm = ({ players, onUpdatePlayers, onAddPlayer, onRemovePlayer }) 
   const handleAddNewPlayer = (e) => {
     e.preventDefault();
     if (newPlayerName.trim()) {
+      // Check if player with same name already exists
+      const existingPlayer = players.find(p => p.name === newPlayerName.trim());
+      if (existingPlayer) {
+        alert(`Player "${newPlayerName.trim()}" already exists!`);
+        setNewPlayerName('');
+        return;
+      }
+      
       const newPlayer = {
-        id: Date.now().toString() + Math.random(),
+        id: Date.now().toString() + '_' + Math.random().toString(36).substring(2, 11),
         name: newPlayerName.trim(),
         prevBalance: 0,
         saturday: 0,

@@ -75,6 +75,12 @@ function App() {
   };
 
   const addPlayer = (player) => {
+    // Check if player with same name already exists
+    const existingPlayer = players.find(p => p.name === player.name);
+    if (existingPlayer) {
+      console.warn(`Player with name "${player.name}" already exists`);
+      return;
+    }
     setPlayers([...players, player]);
   };
 

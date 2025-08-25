@@ -16,8 +16,15 @@ const PlayerMaintenanceModal = ({ isOpen, onClose, players, onDeletePlayer, onAd
 
   const handleAddPlayer = () => {
     if (newPlayerName.trim()) {
+      // Check if player with same name already exists
+      const existingPlayer = players.find(p => p.name === newPlayerName.trim());
+      if (existingPlayer) {
+        alert(`Player "${newPlayerName.trim()}" already exists!`);
+        return;
+      }
+      
       const newPlayer = {
-        id: Date.now().toString() + Math.random(),
+        id: Date.now().toString() + '_' + Math.random().toString(36).substring(2, 11),
         name: newPlayerName.trim(),
         prevBalance: 0,
         saturday: 0,
